@@ -1,0 +1,411 @@
+---
+title: "Actividad 2 Reto"
+author: "Emily Rebeca Méndez Cruz A00830768, Equipo 10"
+date: "1/10/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Analisis de la muestra
+
+### Leyendo los datos
+```{r}
+m = read.csv("mcovidG2Eq10.csv")
+```
+
+Removimiendo de la memoria la matriz de datos inicial
+```{r}
+rm(M)
+```
+
+## Reducción de la base de datos a los positivos en Covid
+
+```{r}
+print("Tamaño de la muestra de M: ")
+length(m$ID_REGISTRO)
+Mp = m[m$CLASIFICACION_FINAL<4, ]
+print("Tamaño de la muestra de Mp: ")
+length(Mp$ID_REGISTRO)
+write.csv("mcovidpositivo.csv", row.names = "FALSE", fileEncoding = "UTF-8")
+```
+
+## Analisis de la muestra final
+¿Se conservó la misma proporción original en la muestra?
+
+```{r}
+
+M1 = read.csv("mcovidG2Eq10.csv")
+
+T2 = table(Mp$SEXO)
+
+prop.table(T2)
+
+```
+
+
+## Tabla bivariada SEXO vs DIABETES
+
+```{r}
+T = table(Mp$SEXO, Mp$DIABETES)
+row.names(T) = c("M", "H")
+colnames(T) = c("SI", "NO", "Quien sabe")
+T
+```
+
+## Cómo seleccionar una parte de la muestra por fechas
+
+```{r}
+
+M2 = Mp[as.Date(M1$FECHA_INGRESO)>as.Date("2021-01-01"),]
+head(M2)
+```
+
+```{r}
+md = m[m$FECHA_DEF != "9999-99-99",]
+Tf = table(md$FECHA_DEF)
+plot(Tf, type = "l", col = "purple")
+
+```
+```{r}
+T8=table(Mp$INTUBADO)
+prop.table(T8)
+names(T8)=c("Si","No","No aplica", "No especificado")
+pie(T8)
+```
+
+Porcentaje de personas positivas a Covid y que presentan o no diabetes:
+```{r}
+T3=table(Mp$DIABETES)
+prop.table(T3)
+names(T3)=c("Si","No","Se ignora")
+pie(T3)
+```
+Porcentaje de personas positivas a Covid y que presentan o no hipertensión:
+```{r}
+T4=table(Mp$HIPERTENSION)
+names(T4)=c("Si","No","Se ignora")
+prop.table(T4)
+names(T4)=c("Si","No","Se ignora")
+pie(T4)
+```
+Porcentaje de personas positivas a Covid y que presentan o no neumonia:
+```{r}
+T5=table(Mp$NEUMONIA)
+prop.table(T5)
+names(T5)=c("Si","No","No especificado")
+pie(T5)
+```
+
+Porcentaje de personas positivas a Covid y que presentan o no obesidad:
+```{r}
+T6=table(Mp$OBESIDAD)
+names(T6)=c("Si","No","Se ignora")
+prop.table(T6)
+names(T6)=c("Si","No","Se ignora")
+pie(T6)
+```
+
+Porcentaje de personas positivas a Covid y que presentan o no problemas cardiovasculares:
+```{r}
+T7=table(Mp$CARDIOVASCULAR)
+names(T7)=c("Si","No","Se ignora")
+prop.table(T7)
+names(T7)=c("Si","No","Se ignora")
+pie(T7)
+```
+
+#Separar los datos en mujer y hombre
+
+```{r}
+print("Hipertensión")
+Hipertensión = table(Mp$SEXO, Mp$HIPERTENSION)
+row.names(Hipertensión) = c("M", "H")
+colnames(Hipertensión) = c("Si", "No", "Se ignora")
+Hipertensión
+prop.table(Hipertensión)
+plot(Hipertensión, col=3:2)
+```
+
+```{r}
+print("Diabetes")
+Diabetes = table(Mp$SEXO, Mp$DIABETES)
+row.names(Diabetes) = c("M", "H")
+colnames(Diabetes) = c("Si", "No", "Se ignora")
+Diabetes
+prop.table(Diabetes)
+plot(Diabetes, col=3:2)
+```
+
+```{r}
+print("Neumonia")
+Neumonia = table(Mp$SEXO, Mp$NEUMONIA)
+row.names(Neumonia) = c("M", "H")
+colnames(Neumonia) = c("Si", "No", "No especificado")
+Neumonia
+prop.table(Neumonia)
+plot(Neumonia, col=3:2)
+```
+
+```{r}
+print("Obesidad")
+Obesidad = table(Mp$SEXO, Mp$OBESIDAD)
+row.names(Obesidad) = c("M", "H")
+colnames(Obesidad) = c("Si", "No", "Se ignora")
+Obesidad
+prop.table(Obesidad)
+plot(Obesidad, col=3:2)
+```
+
+```{r}
+print("Intubados")
+Intubados = table(Mp$SEXO, Mp$INTUBADO)
+row.names(Intubados) = c("M", "H")
+colnames(Intubados) = c("Si","No","No aplica", "No especificado")
+Intubados
+prop.table(Intubados)
+plot(Intubados, col=c("3","2","4","orange"))
+```
+
+
+
+```{r}
+f1 = table(Mp$OBESIDAD)[1] #Si tienen
+f2 = table(Mp$INTUBADO)[1]
+n1 = length(Mp$OBESIDAD) 
+n2 = length(Mp$INTUBADO) 
+
+p = c(f1,f2 )
+n = c(n1, n2)
+prop.test(p, n, conf.level = 0.95, correct = FALSE) #Más obesos que intubados
+```
+```{r}
+f3 = table(Mp$NEUMONIA)[1]
+f4 = table(Mp$INTUBADO)[1]
+n3 = length(Mp$NEUMONIA) 
+n4 = length(Mp$INTUBADO) 
+
+p = c(f3,f4 )
+n = c(n3, n4)
+prop.test(p, n, conf.level = 0.95, correct = FALSE)
+```
+```{r}
+f5 = table(Mp$DIABETES)[1]
+f6 = table(Mp$INTUBADO)[1]
+n5 = length(Mp$DIABETES) 
+n6 = length(Mp$INTUBADO) 
+
+p = c(f5,f6 )
+n = c(n5, n6)
+prop.test(p, n, conf.level = 0.95, correct = FALSE)
+```
+
+```{r}
+f7 = table(Mp$HIPERTENSION)[1]
+f8 = table(Mp$INTUBADO)[1]
+n7 = length(Mp$HIPERTENSION) 
+n8 = length(Mp$INTUBADO) 
+
+p = c(f7,f8 )
+n = c(n7, n8)
+prop.test(p, n, conf.level = 0.95, correct = FALSE)
+```
+
+##Cantidad y proporcionalidad de fallecidos que sufrían de morbilidades en 2021
+
+```{r}
+Mx=Mp[Mp$DIABETES == 1 & Mp$FECHA_DEF != "9999-99-99" & Mp$FECHA_DEF >= "2021-01-01",]
+print("Fallecidos que tuvieron diabetes")
+table(Mx$DIABETES)
+print("Fallecidos que tuvieron diabetes dividido por sexo")
+Sx=table(Mx$SEXO)
+Sx
+
+THx=table(Mx$HIPERTENSION)
+print("Fallecidos que tuvieron diabetes e hipertension")
+THx
+print("Proporcionalidad que tiene diabetes e hipertensión")
+prop.table(THx) 
+
+
+print("Fallecidos que tuvieron diabetes y obesidad")
+TOx=table(Mx$OBESIDAD)
+TOx
+print("Proporcionalidad que tiene diabetes y obesidad")
+prop.table(TOx)
+
+
+TNx=table(Mx$NEUMONIA)
+print("Fallecidos que tuvieron diabetes y neumonia")
+TNx
+print("Proporcionalidad que tiene diabetes y neumonia")
+prop.table(TNx)
+
+```
+
+```{r}
+Mn=Mp[Mp$NEUMONIA == 1 & Mp$FECHA_DEF != "9999-99-99" & Mp$FECHA_DEF > "2021-01-01",]
+print("Fallecidos que tuvieron neumonia")
+table(Mn$NEUMONIA)
+print("Fallecidos que tuvieron neumonia dividido por sexo")
+Sn=table(Mn$SEXO)
+Sn
+
+THn=table(Mn$HIPERTENSION)
+print("Fallecidos que tuvieron neumonia e hipertension")
+THn
+print("Proporcionalidad que tiene neumonia e hipertensión")
+prop.table(THn) 
+
+
+print("Fallecidos que tuvieron neumonia y obesidad")
+TOn=table(Mn$OBESIDAD)
+TOn
+print("Proporcionalidad que tiene neumonia y obesidad")
+prop.table(TOn)
+
+
+TDn=table(Mn$DIABETES)
+print("Fallecidos que tuvieron neumonia y diabetes")
+TDn
+print("Proporcionalidad que tiene neumonia y diabetes")
+prop.table(TDn)
+```
+
+```{r}
+Mo=Mp[Mp$OBESIDAD == 1 & Mp$FECHA_DEF != "9999-99-99" & Mp$FECHA_DEF > "2021-01-01",]
+print("Fallecidos que tuvieron obesidad")
+table(Mo$OBESIDAD)
+print("Fallecidos que tuvieron obesidad dividido por sexo")
+So=table(Mo$SEXO)
+So
+
+THo=table(Mo$HIPERTENSION)
+print("Fallecidos que tuvieron obesidad e hipertension")
+THo
+print("Proporcionalidad que tiene obesidad e hipertensión")
+prop.table(THo) 
+
+
+print("Fallecidos que tuvieron obesidad y neumonia")
+TNo=table(Mo$NEUMONIA)
+TNo
+print("Proporcionalidad que tiene obesidad y neumonia")
+prop.table(TNo)
+
+
+TDo=table(Mo$DIABETES)
+print("Fallecidos que tuvieron obesidad y diabetes")
+TDo
+print("Proporcionalidad que tiene obesidad y diabetes")
+prop.table(TDo)
+```
+
+```{r}
+Mh=Mp[Mp$HIPERTENSION == 1 & Mp$FECHA_DEF != "9999-99-99" & Mp$FECHA_DEF > "2021-01-01",]
+print("Fallecidos que tuvieron hipertension")
+table(Mh$HIPERTENSION)
+print("Fallecidos que tuvieron hipertension dividido por sexo")
+Sh=table(Mh$SEXO)
+Sh
+
+TOh=table(Mh$OBESIDAD)
+print("Fallecidos que tuvieron  hipertension y obesidad")
+TOh
+print("Proporcionalidad que tiene hipertension y obesidad")
+prop.table(TOh) 
+
+
+print("Fallecidos que tuvieron hipertension y neumonia")
+TNh=table(Mh$NEUMONIA)
+TNh
+print("Proporcionalidad que tiene hipertension y neumonia")
+prop.table(TNh)
+
+
+TDh=table(Mh$DIABETES)
+print("Fallecidos que tuvieron hipertension y diabetes")
+TDh
+print("Proporcionalidad que tiene hipertension y diabetes")
+prop.table(TDh)
+```
+
+```{r}
+mu = Mp[Mp$FECHA_DEF>"2021-01-01"& Mp$FECHA_DEF!= "9999-99-99" & Mp$FECHA_INGRESO>"2021-01-01" & (Mp$DIABETES==1 | Mp$HIPERTENSION==1 | Mp$OBESIDAD==1 | Mp$NEUMONIA==1),] # muertos que tienen al menos una de estas morbilidades
+mu
+Mp[Mp$FECHA_INGRESO>"2021-01-01" & Mp$FECHA_DEF == "9999-99-99" &(Mp$DIABETES==1 | Mp$HIPERTENSION==1 | Mp$OBESIDAD==1 | Mp$NEUMONIA==1), ] # pacientes que tienen al menos una morbilidad y sobrevivieron
+```
+Como podemos observar hay 976 fallecidos por COVID que tenian al menos una de las morbilidades, mientras que hay 4501 que tenian al menos una morbilidad pero sobrevivieron. El total de pacientes con morbilidad es de 5477. Teniendo una proporcion de 0.8218 para sobrevivir si se tiene al menos una morbilidad.
+
+
+```{r}
+# Consultando Descriptores y Catálogo de la Secretaría de Salud: 
+Mx = Mp[(Mp$DIABETES == 2 & Mp$NEUMONIA == 2 & Mp$HIPERTENSION == 2 & Mp$OBESIDAD==2) & Mp$FECHA_DEF != "9999-99-99" & Mp$FECHA_DEF > "2021-01-01" & Mp$FECHA_INGRESO > "2021-01-01", ]
+Mx
+Mv = Mp[(Mp$DIABETES == 2& Mp$NEUMONIA == 2 & Mp$HIPERTENSION == 2 & Mp$OBESIDAD==2) & Mp$FECHA_DEF == "9999-99-99" & Mp$FECHA_INGRESO > "2021-01-01", ]
+Mv
+```
+Tenemos 133 casos de fallecimiento por COVID de los que no tienen ninguna morbilidad. Mientras que 14699 casos de pacientes sin ninguna morbilidad que sobrevivieron. Lo cual nos da que la proporcion para que alguien sin morbilidad sobreviva sea de 0.9910.
+
+
+Ahora chequemos el año anterior
+```{r}
+Md = Mp[Mp$FECHA_DEF<"2021-01-01"& Mp$FECHA_DEF!= "9999-99-99",] # muertos despues de 01/01/2020 y antes de 01/01/2021
+mu1 = Mp[Mp$FECHA_DEF<"2021-01-01"& Mp$FECHA_DEF!= "9999-99-99" & (Mp$DIABETES==1 | Mp$HIPERTENSION==1 | Mp$OBESIDAD==1 | Mp$NEUMONIA==1),] # muertos que tienen al menos una de estas morbilidades
+mu1
+Mp[Mp$FECHA_INGRESO<"2021-01-01" & Mp$FECHA_DEF == "9999-99-99" & (Mp$DIABETES==1 | Mp$HIPERTENSION==1 | Mp$OBESIDAD==1 | Mp$NEUMONIA==1), ] # pacientes que tienen al menos una morbilidad y sobrevivieron
+```
+
+Hay 1252 defunciones de pacientes con alguna morbilidad, mientras que 4295 que tambien tienen alguna morbilidad sobrevivieron. La proporcion de sobrevivir en este caso seria de 0.7743.
+
+```{r}
+# Consultando Descriptores y Catálogo de la Secretaría de Salud: 
+Mx1 = Mp[(Mp$DIABETES == 2 & Mp$NEUMONIA == 2 & Mp$HIPERTENSION == 2 & Mp$OBESIDAD==2) & Mp$FECHA_DEF != "9999-99-99" & Mp$FECHA_DEF < "2021-01-01", ]
+Mx1
+Mv1 = Mp[(Mp$DIABETES == 2& Mp$NEUMONIA == 2 & Mp$HIPERTENSION == 2 & Mp$OBESIDAD==2) & Mp$FECHA_DEF == "9999-99-99" &  Mp$FECHA_INGRESO < "2021-01-01", ]
+Mv1
+```
+
+En el caso de personas que no tienen ninguna morbilidad podemos observar que hay 157 que fallecieron, mientras que 8341 sobrevieron. Entonces tenemos que la proporcion de los que sobrevivieron es de 0.9815
+
+
+```{r}
+x1=4501
+n1=(x1+976)
+p1=x1/n1
+p1
+x2=14699#Sin morbilidades
+n2=(x2+133)
+p2=x2/n2
+p2
+pp=(x1+x2)/(n1+n2)
+pp
+denominador=((p1*(1-p1))/n1)+((p2*(1-p2))/n2)
+denominador
+z=((p1)-(p2))/(sqrt(denominador))
+z
+qnorm(0.05)
+
+```
+
+```{r}
+x1=4295
+n1=(x1+1252)
+p1=x1/n1
+p1
+x2=8341#Sin morbilidades
+n2=(x2+157)
+p2=x2/n2
+p2
+denominador=((p1*(1-p1))/n1)+((p2*(1-p2))/n2)
+denominador
+z=((p1)-(p2))/(sqrt(denominador))
+z
+qnorm(0.05)
+pnorm(z)
+```
+
